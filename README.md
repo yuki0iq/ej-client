@@ -10,6 +10,11 @@ ejudge (C) 2000-2020 Alexander Chernov
 
 # How to build
 
+## Dependencies
+* Any C++11 compliant compiler, but may compile with other
+* qmake, QtCore and QtNetwork 5.10+, but may compile with other versions not lesser than 5.0
+* make utility for making qmake-generated makefiles
+
 ## From command line
 assuming `make` is your make utility
 ```
