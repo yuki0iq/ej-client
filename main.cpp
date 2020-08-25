@@ -582,7 +582,7 @@ bool do_interactive(QNetworkAccessManager *qnam)
 				"  get_code <subid>: print source code for <subid>\n"
 				"Warning! path to any file SHOULD NOT contain spaces!\n"
 				"ej-client supports simplified syntax for launching single command:\n"
-				"  ej-client <command> <login> <password> <contest> <args...>\n"
+				"  ej-client <host> <command> <login> <password> <contest> <args...>\n"
 				"where <command> is not in { login, logout }\n"
 			);
 		}
