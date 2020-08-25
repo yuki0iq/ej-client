@@ -46,16 +46,27 @@ bool ej_logout(QNetworkAccessManager *qnam, QString &sid);
 bool do_interactive(QNetworkAccessManager *qnam);
 bool do_cmdline(QNetworkAccessManager *qnam, int argc, char **argv);
 
+QString sHost = "http://ejudge.algocode.ru/";
+
 int main(int argc, char *argv[])
 {
 	QCoreApplication a(argc, argv);
 	QNetworkAccessManager *qnam = new QNetworkAccessManager;
 
-	int iRes = 0;
-
 	if (argc > 1)
 	{
-		iRes = do_cmdline(qnam, argc, argv) - 1;
+		sHost = QString::fromUtf8(argv[1]);
+	}
+	else
+	{
+		printf("Using default ejudge host: %s\n", sHost.toUtf8().data());
+	}
+
+	int iRes = 0;
+
+	if (argc > 2)
+	{
+		iRes = do_cmdline(qnam, argc, argv + 1) - 1;
 	}
 	else
 	{
@@ -95,7 +106,7 @@ bool waitForReplyDone(QNetworkReply *reply, QVector<QUrl> &urls)
 
 QVector<QUrl> doAction(QVector<QVariant> &args, const QString &sid, int id, QNetworkAccessManager *qnam)
 {
-	QString req = QString("http://ejudge.algocode.ru/cgi-bin/new-client?SID=%1&action=%2").arg(sid).arg(id);
+	QString req = sHost + QString("cgi-bin/new-client?SID=%1&action=%2").arg(sid).arg(id);
 	switch (id)
 	{
 		// For simple actions that require no params, do nothing
@@ -199,7 +210,7 @@ unsigned char *getStatus(const QString &s)
 
 bool ej_login(QNetworkAccessManager *qnam, QString &sid, const QString &login, const QString &pass, const QString &cid)
 {
-	QNetworkRequest loginreq(QUrl("http://ejudge.algocode.ru/cgi-bin/new-client"));
+	QNetworkRequest loginreq(QUrl(sHost + "cgi-bin/new-client"));
 	loginreq.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 	QNetworkReply *reply = qnam->post(loginreq, (
 		QString("?role=0&prob_name=&locale_id=0&action_2=Log+in")
@@ -410,7 +421,7 @@ bool ej_submit_prob(QNetworkAccessManager *qnam, const QString &sid, const QStri
 	data += QString("--123\r\nContent-Disposition: form-data; name=\"action_40\"\r\n\r\nSend!\r\n");
 	data += QString("--123--\r\n");
 
-	QNetworkRequest request(QUrl("http://ejudge.algocode.ru/cgi-bin/new-client"));
+	QNetworkRequest request(QUrl(sHost + "cgi-bin/new-client"));
 	request.setRawHeader("Content-Type", "multipart/form-data; boundary=123");
 	request.setRawHeader("Content-Length", QString::number(data.toUtf8().size()).toUtf8());
 
@@ -531,9 +542,8 @@ bool ej_logout(QNetworkAccessManager *qnam, QString &sid)
 bool do_interactive(QNetworkAccessManager *qnam)
 {
 	printf(
-		"ej-client: ejudge console client, 1.0. Licensed under 3-clause BSD license\n"
-		"    a Qt-based console client for submitting solutions and viewing problems for\n"
-		"      ejudge at ejudge.algocode.ru\n"
+		"ej-client: ejudge console client, 1.1. Licensed under 3-clause BSD license\n"
+		"    a Qt-based console client for submitting solutions and viewing problems for ejudge\n"
 		"  ej-client (C) 2020 developerxyz. Contact me on telegram [t.me/developerxyz]\n"
 		"  ejudge (C) 2000-2020 Alexander Chernov\n"
 		"    Don't know how to start? Try writing \"help\" down!\n"
@@ -553,6 +563,9 @@ bool do_interactive(QNetworkAccessManager *qnam)
 				"Available commands:\n"
 				"  help: view this help\n"
 				"  exit: close ej-client\n"
+				"  host: print current ejudge host url\n"
+				"  set_host <address>:\n"
+				"    set ejudge host (with slash!!!). Default: 'http://ejudge.algocode.ru/'\n"
 				"  login <login> <password> <contest_id>:\n"
 				"    login to contest <contest_id> with given creds\n"
 				"  logout: do logout\n"
@@ -685,6 +698,21 @@ bool do_interactive(QNetworkAccessManager *qnam)
 					"Check internet connection or ping ejudge.\n"
 					"You may need to relogin\n"
 				);
+			}
+		}
+		else if (cmd == "host")
+		{
+			printf("Current host is '%s'\n", sHost.toUtf8().data());
+		}
+		else if (cmd == "set_host")
+		{
+			QString host;
+			tin >> host;
+			printf("Logging out...\n");
+			if (sid.isEmpty() || ej_logout(qnam, sid))
+			{
+				printf("Using host %s\n", host.toUtf8().data());
+				sHost = host;
 			}
 		}
 		else
