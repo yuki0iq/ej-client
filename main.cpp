@@ -30,6 +30,7 @@ struct SSubRow
 EAction parseAction(char *action);
 bool waitForReplyDone(QNetworkReply *reply, QVector<QUrl> &urls);
 QVector<QUrl> doAction(QVector<QVariant> &args, const QString &sid, int id, QNetworkAccessManager *qnam);
+QVector<QUrl> doAction(const QString &sid, int id, QNetworkAccessManager *qnam);
 QString readAll(QUrl url, QNetworkAccessManager *qnam);
 QString split(const QString &x, const QString &left, const QString &right);
 pair<QString, long /*after right*/> split2(const QString &x, const QString &left, const QString &right, long pos);
@@ -134,6 +135,12 @@ QVector<QUrl> doAction(QVector<QVariant> &args, const QString &sid, int id, QNet
 	return QVector<QUrl>();
 }
 
+QVector<QUrl> doAction(const QString &sid, int id, QNetworkAccessManager *qnam)
+{
+	QVector<QVariant> a;
+	return doAction(a, sid, id, qnam);
+}
+
 QString readAll(QUrl url, QNetworkAccessManager *qnam)
 {
 	QNetworkReply *r = qnam->get(QNetworkRequest(url));
@@ -234,7 +241,7 @@ bool ej_login(QNetworkAccessManager *qnam, QString &sid, const QString &login, c
 bool ej_list_subs(QNetworkAccessManager *qnam, const QString &sid)
 {
 	QVector<QUrl> vec;
-	if ((vec = doAction(QVector<QVariant>(), sid, 140, qnam)).isEmpty())
+	if ((vec = doAction(sid, 140, qnam)).isEmpty())
 		return false;
 	QString html = readAll(vec.back(), qnam);
 
@@ -296,7 +303,7 @@ bool ej_list_subs(QNetworkAccessManager *qnam, const QString &sid)
 bool ej_list_tasks(QNetworkAccessManager *qnam, const QString &sid)
 {
 	QVector<QUrl> vec;
-	if ((vec = doAction(QVector<QVariant>(), sid, 137, qnam)).isEmpty())
+	if ((vec = doAction(sid, 137, qnam)).isEmpty())
 		return false;
 	QString html = readAll(vec.back(), qnam);
 	
@@ -531,7 +538,7 @@ bool ej_get_code(QNetworkAccessManager *qnam, const QString &sid, const QString 
 
 bool ej_logout(QNetworkAccessManager *qnam, QString &sid)
 {
-	if (!doAction(QVector<QVariant>(), sid, 74, qnam).isEmpty())
+	if (!doAction(sid, 74, qnam).isEmpty())
 	{
 		sid.clear();
 		return true;

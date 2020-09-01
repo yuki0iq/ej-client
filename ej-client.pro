@@ -1,5 +1,6 @@
 TARGET = ej-client
 TEMPLATE = app
+CONFIG += console
 
 QT -= gui
 QT += network
