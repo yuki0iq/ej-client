@@ -381,31 +381,40 @@ bool ej_get_prob(QNetworkAccessManager *qnam, const QString &sid, const QString 
 	long pos = 0;
 	pair<QString, long> constraints2 = split2(innerHtml, "<table class=\"line-table-wb\">", "</table>", 0);
 	pos = constraints2.second;
-	text += constraints2.first.replace("\n", "").replace("  <tr><td><b>", "").replace("</b></td><td><tt>", " ").replace("</tt></td></tr>", "\n");
+	QString tmp = constraints2.first
+		.replace("\n", "")
+		.replace("  <tr><td><b>", "")
+		.replace("</b></td><td><tt>", " ")
+		.replace("</tt></td></tr>", "\n");
+	text += tmp;
 
-	pos = innerHtml.indexOf("</h3>", pos) + 5;
-	QString innerHtml2 = innerHtml.right(innerHtml.size() - pos).trimmed();
-	pos = 0;
-
-	while (pos < innerHtml2.size())
+	if (html.indexOf("</h3><form") != -1)
 	{
-		long pos_pre = innerHtml.indexOf("<pre>", pos), pos_pre1, pos_pre2, pos_pre3;
-		if (pos_pre == -1)
+		pos = innerHtml.indexOf("</h3>", pos) + 5;
+		QString innerHtml2 = innerHtml.right(innerHtml.size() - pos).trimmed();
+		pos = 0;
+
+		while (pos < innerHtml2.size())
 		{
-			pos_pre1 = pos_pre2 = pos_pre3 = pos_pre = innerHtml.size();
+			long pos_pre = innerHtml.indexOf("<pre>", pos), pos_pre1, pos_pre2, pos_pre3;
+			if (pos_pre == -1)
+			{
+				pos_pre1 = pos_pre2 = pos_pre3 = pos_pre = innerHtml.size();
+			}
+			else
+			{
+				pos_pre1 = pos_pre + 5;
+				pos_pre2 = innerHtml.indexOf("</pre>", pos_pre);
+				pos_pre3 = pos_pre2 + 6;
+			}
+			QString s1 = innerHtml2.left(pos_pre1).right(pos_pre1 - pos)
+				.replace(QRegularExpression("(<(h[34]|p|[\\/]?span.*?)>|\\n)"), "")
+				.replace(QRegularExpression("<\\/(h[34]|p)>"), "\n");
+			text += s1;
+			QString s2 = innerHtml2.left(pos_pre3).right(pos_pre3 - pos_pre1);
+			text += s2;
+			pos = pos_pre3;
 		}
-		else
-		{
-			pos_pre1 = pos_pre + 5;
-			pos_pre2 = innerHtml.indexOf("</pre>", pos_pre);
-			pos_pre3 = pos_pre2 + 6;
-		}
-		QString s1 = innerHtml2.left(pos_pre).right(pos_pre - pos)
-			.replace(QRegularExpression("(<(h[34]|p|[\\/]?span.*?)>|\\n)"), "")
-			.replace(QRegularExpression("<\\/(h[34]|p)>"), "\n");
-		text += s1;
-		text += innerHtml2.left(pos_pre2).right(pos_pre2 - pos_pre1);
-		pos = pos_pre3;
 	}
 
 	printf(text.toUtf8().data());
