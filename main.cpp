@@ -2,7 +2,7 @@
 #include <QtNetwork>
 #include <utility>
 #include <iostream>
-#include "linker.h"
+#include "Linker.h"
 
 using namespace std;
 
@@ -389,15 +389,23 @@ bool ej_get_prob(QNetworkAccessManager *qnam, const QString &sid, const QString 
 
 	while (pos < innerHtml2.size())
 	{
-		long pos_pre = innerHtml2.indexOf("<pre>", pos);
-		long pos_pre1 = pos_pre + 5;
-		long pos_pre2 = innerHtml2.indexOf("</pre>", pos_pre);
+		long pos_pre = innerHtml.indexOf("<pre>", pos), pos_pre1, pos_pre2, pos_pre3;
+		if (pos_pre == -1)
+		{
+			pos_pre1 = pos_pre2 = pos_pre3 = pos_pre = innerHtml.size();
+		}
+		else
+		{
+			pos_pre1 = pos_pre + 5;
+			pos_pre2 = innerHtml.indexOf("</pre>", pos_pre);
+			pos_pre3 = pos_pre2 + 6;
+		}
 		QString s1 = innerHtml2.left(pos_pre).right(pos_pre - pos)
 			.replace(QRegularExpression("(<(h[34]|p|[\\/]?span.*?)>|\\n)"), "")
 			.replace(QRegularExpression("<\\/(h[34]|p)>"), "\n");
 		text += s1;
 		text += innerHtml2.left(pos_pre2).right(pos_pre2 - pos_pre1);
-		pos = pos_pre2 + 6;
+		pos = pos_pre3;
 	}
 
 	printf(text.toUtf8().data());
@@ -480,7 +488,7 @@ bool ej_get_subid(QNetworkAccessManager *qnam, const QString &sid, const QString
 		QString s1 = innerHtml.left(pos_pre).right(pos_pre - pos)
 			.replace(QRegularExpression("(<(h[234].*?|p.*?|\\/t(d|able)|tr|[\\/]?(span|div|font|big).*?)>|\\n)"), "")
 			.replace(QRegularExpression("<(\\/(h[234]|p)|br[\\s+[\\/]?]?|\\/tr)>"), "\n")
-			.replace(QRegExp("\\s\\s+"), "")
+			.replace(QRegularExpression("\\s\\s+"), "")
 			.replace("<table class=\"message-table\"><tr class=\"mes-top\"><td>Author<td>Run comment", "")
 			.replace("<table class=\"table\"><th class=\"b1\">N</th><th class=\"b1\">Result</th><th class=\"b1\">Time (sec)</th>", "")
 			.replace("\n<td class=\"profile\"><b>Judge</b>", "")
