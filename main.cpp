@@ -396,22 +396,23 @@ bool ej_get_prob(QNetworkAccessManager *qnam, const QString &sid, const QString 
 
 		while (pos < innerHtml2.size())
 		{
-			long pos_pre = innerHtml.indexOf("<pre>", pos), pos_pre1, pos_pre2, pos_pre3;
+			long pos_pre = innerHtml2.indexOf("<pre>", pos), pos_pre1, pos_pre2, pos_pre3;
 			if (pos_pre == -1)
 			{
-				pos_pre1 = pos_pre2 = pos_pre3 = pos_pre = innerHtml.size();
+				pos_pre1 = pos_pre2 = pos_pre3 = pos_pre = innerHtml2.size();
 			}
 			else
 			{
 				pos_pre1 = pos_pre + 5;
-				pos_pre2 = innerHtml.indexOf("</pre>", pos_pre);
+				pos_pre2 = innerHtml2.indexOf("</pre>", pos_pre);
 				pos_pre3 = pos_pre2 + 6;
 			}
-			QString s1 = innerHtml2.left(pos_pre1).right(pos_pre1 - pos)
+			QString s01 = innerHtml2.left(pos_pre).right(pos_pre - pos);
+			QString s1 = s01
 				.replace(QRegularExpression("(<(h[34]|p|[\\/]?span.*?)>|\\n)"), "")
 				.replace(QRegularExpression("<\\/(h[34]|p)>"), "\n");
 			text += s1;
-			QString s2 = innerHtml2.left(pos_pre3).right(pos_pre3 - pos_pre1);
+			QString s2 = innerHtml2.left(pos_pre2).right(pos_pre2 - pos_pre1);
 			text += s2;
 			pos = pos_pre3;
 		}
