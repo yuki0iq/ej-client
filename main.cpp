@@ -569,8 +569,7 @@ bool do_interactive(QNetworkAccessManager *qnam)
 	printf(
 		"ej-client: ejudge console client, 1.1. Licensed under 3-clause BSD license\n"
 		"    a Qt-based console client for submitting solutions and viewing problems for ejudge\n"
-		"  ej-client (C) 2020 developerxyz. Contact me on telegram [t.me/developerxyz]\n"
-		"  ejudge (C) 2000-2020 Alexander Chernov\n"
+		"  ej-client was created in 2020 by Yuki0iq\n"
 		"    Don't know how to start? Try writing \"help\" down!\n"
 	);
 	QString sid, cmd;
