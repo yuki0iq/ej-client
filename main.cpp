@@ -746,7 +746,7 @@ bool do_interactive(QNetworkAccessManager *qnam)
 				"Error: entered unknown command!\n"
 				"Try writing \"help\" and check if it exists.\n"
 				"If you believe this is not an error or you know how to make ej-client better,\n"
-				"contact me at telegram: t.me/develoeprxyz\n"
+				"contact me at telegram: t.me/yuki_the_girl\n"
 			);
 		}
 	}
