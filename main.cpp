@@ -579,7 +579,8 @@ bool do_interactive(QNetworkAccessManager *qnam)
 	{
 		printf("\n> ");
 		tin >> cmd;
-		cmd.toLower();
+        cmd = cmd.toLower();
+        if (tin.atEnd()) break;
 		if (cmd == "exit")
 			break;
 		else if (cmd == "help")
